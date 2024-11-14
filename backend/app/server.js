@@ -21,6 +21,8 @@ app.use(cors({
   credentials: true,
 }));
 
+app.use('/thesis/files', express.static(path.join(__dirname, 'student-thesis')));
+
 app.use(bodyParser.json());
 
 // Middleware for authentication
