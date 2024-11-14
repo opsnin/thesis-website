@@ -11,7 +11,7 @@ const FeedbackView = () => {
   const [assignmentDetails, setAssignmentDetails] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const role = localStorage.getItem('role'); // Retrieve role to control feedback submission access
+  const role = localStorage.getItem('role');
 
   useEffect(() => {
     if (thesisId) {
@@ -29,9 +29,7 @@ const FeedbackView = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      if (!response.ok) {
-        throw new Error('Failed to fetch assignment details');
-      }
+      if (!response.ok) throw new Error('Failed to fetch assignment details');
       const data = await response.json();
       setAssignmentDetails(data);
     } catch (err) {
@@ -46,9 +44,7 @@ const FeedbackView = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      if (!response.ok) {
-        throw new Error('Failed to fetch feedback');
-      }
+      if (!response.ok) throw new Error('Failed to fetch feedback');
       const data = await response.json();
       setFeedbacks(data);
     } catch (err) {
@@ -72,9 +68,7 @@ const FeedbackView = () => {
         },
         body: JSON.stringify({ content: newFeedback }),
       });
-      if (!response.ok) {
-        throw new Error('Failed to submit feedback');
-      }
+      if (!response.ok) throw new Error('Failed to submit feedback');
 
       setSuccess('Feedback submitted successfully');
       setNewFeedback('');
@@ -119,10 +113,23 @@ const FeedbackView = () => {
           {feedbacks.length > 0 ? (
             feedbacks.map((feedback, index) => (
               <div key={feedback.id || index} className="flex items-start mb-4">
-                <div className="w-12 h-12 flex-shrink-0 bg-gray-300 rounded-full flex items-center justify-center mr-4">
-                  <span className="text-xs text-gray-700">{feedback.author?.username || 'Teacher'}</span>
+                <div
+                  className="flex items-center justify-center mr-4 text-xs text-white font-bold rounded-full"
+                  style={{
+                    backgroundColor: feedback.author?.userId === feedbacks[0]?.author?.userId ? '#4A90E2' : '#50E3C2',
+                    width: `${feedback.author?.username.length * 8}px`, // Dynamically adjusts width to fit username
+                    height: '30px',
+                  }}
+                >
+                  {feedback.author?.username || 'Teacher'}
                 </div>
-                <div className={`p-4 rounded-lg shadow-md max-w-lg ${index % 2 === 0 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-black'}`}>
+                <div
+                  className={`p-4 rounded-lg shadow-md max-w-lg`}
+                  style={{
+                    backgroundColor: feedback.author?.userId === feedbacks[0]?.author?.userId ? '#D8E6FF' : '#F0F8F6',
+                    color: feedback.author?.userId === feedbacks[0]?.author?.userId ? '#004085' : '#3E4E5A',
+                  }}
+                >
                   <p>{feedback.content}</p>
                 </div>
               </div>

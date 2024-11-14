@@ -172,8 +172,8 @@ app.post('/thesis/:thesisId/feedbacks', authenticate, authorizeTeacher, async (r
     const feedback = await prisma.feedback.create({
       data: {
         content,
-        thesisId: parseInt(thesisId),
-        teacherId: req.userId,
+        thesisId: parseInt(thesisId), // Ensures thesisId is linked to the existing Thesis entry
+        userId: req.userId, // Use userId from the token (authenticated teacher)
       },
     });
     res.status(201).json({ message: 'Feedback submitted successfully', feedback });
@@ -182,6 +182,7 @@ app.post('/thesis/:thesisId/feedbacks', authenticate, authorizeTeacher, async (r
     res.status(500).json({ message: 'Failed to submit feedback' });
   }
 });
+
 // Backend route to get all theses assigned to a student with feedback
 app.get('/thesis/student', authenticate, async (req, res) => {
     try {
