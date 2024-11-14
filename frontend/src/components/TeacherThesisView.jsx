@@ -8,7 +8,6 @@ const TeacherThesisView = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Fetch all thesis titles on component mount
   useEffect(() => {
     fetchTheses();
   }, []);
@@ -32,9 +31,27 @@ const TeacherThesisView = () => {
     }
   };
 
-  // Handle thesis click to navigate to the feedback view
   const handleThesisClick = (thesisId) => {
     navigate(`/feedback-view/${thesisId}`);
+  };
+
+  const handleDeleteThesis = async (thesisId) => {
+    try {
+      const response = await fetch(`${backendUrl}/thesis/${thesisId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete thesis');
+      }
+
+      setTheses((prevTheses) => prevTheses.filter((thesis) => thesis.id !== thesisId));
+    } catch (err) {
+      setError('Failed to delete thesis');
+    }
   };
 
   return (
@@ -55,31 +72,40 @@ const TeacherThesisView = () => {
           theses.map((thesis) => (
             <div
               key={thesis.id}
-              className="bg-gray-200 p-4 rounded-lg mb-4 shadow-md cursor-pointer"
-              onClick={() => handleThesisClick(thesis.id)}
+              className="bg-gray-200 p-4 rounded-lg mb-4 shadow-md"
             >
-              <h2 className="text-lg font-semibold text-blue-800">{thesis.title}</h2>
-              <p className="text-gray-700">{thesis.description}</p>
-              <p className="text-sm text-gray-600">Due date: {thesis.date}</p>
-              <p className="text-sm text-gray-600 mt-2">
-                Assigned to: {thesis.requestedBy ? thesis.student?.username : 'Not assigned till now'}
-              </p>
-              <p className="text-sm text-gray-600 mt-2">
-                Last Update: {thesis.lastUpdate ? new Date(thesis.lastUpdate).toLocaleDateString() : 'No updates yet'}
-              </p>
-              {thesis.fileName && (
-                <p className="text-sm text-gray-600 mt-2">
-                  File: {thesis.fileName}
-                  <a
-                    href={`${backendUrl}/student-thesis/${thesis.fileName}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 ml-2"
-                  >
-                    Download
-                  </a>
-                </p>
-              )}
+              <div className="flex justify-between items-center">
+                <div className="cursor-pointer" onClick={() => handleThesisClick(thesis.id)}>
+                  <h2 className="text-lg font-semibold text-blue-800">{thesis.title}</h2>
+                  <p className="text-gray-700">{thesis.description}</p>
+                  <p className="text-sm text-gray-600">Due date: {thesis.date}</p>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Assigned to: {thesis.requestedBy ? thesis.student?.username : 'Not assigned till now'}
+                  </p>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Last Update: {thesis.lastUpdate ? new Date(thesis.lastUpdate).toLocaleDateString() : 'No updates yet'}
+                  </p>
+                  {thesis.fileName && (
+                    <p className="text-sm text-gray-600 mt-2">
+                      File: {thesis.fileName}
+                      <a
+                        href={`${backendUrl}/student-thesis/${thesis.fileName}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 ml-2"
+                      >
+                        Download
+                      </a>
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={() => handleDeleteThesis(thesis.id)}
+                  className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))
         )}

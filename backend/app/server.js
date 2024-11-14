@@ -17,7 +17,7 @@ const SECRET_KEY = 'your_jwt_secret_key';
 // Enable CORS for requests from frontend
 app.use(cors({
   origin: 'http://localhost:5173',
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST','DELETE'],
   credentials: true,
 }));
 
@@ -158,6 +158,20 @@ const storage = multer.diskStorage({
     }
   });
   
+// Delete a thesis by ID
+app.delete('/thesis/:thesisId', authenticate, authorizeTeacher, async (req, res) => {
+  const { thesisId } = req.params;
+
+  try {
+    await prisma.thesis.delete({
+      where: { id: parseInt(thesisId) },
+    });
+    res.status(200).json({ message: 'Thesis deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting thesis:', error);
+    res.status(500).json({ message: 'Failed to delete thesis' });
+  }
+});
   
 // Route to submit feedback (POST /thesis/:thesisId/feedbacks)
 app.post('/thesis/:thesisId/feedbacks', authenticate, authorizeTeacher, async (req, res) => {
