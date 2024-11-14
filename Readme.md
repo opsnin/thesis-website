@@ -43,7 +43,7 @@ npm start
 This command will start both servers concurrently. You can access the application at the following URLs:
 
 - Frontend: [http://localhost:5173](http://localhost:5173)
-- Backend: [http://localhost:5147](http://localhost:5174)
+- Backend: [http://localhost:5174](http://localhost:5174)
 
 ## Project Structure
 
