@@ -139,7 +139,7 @@ const FeedbackView = () => {
           )}
         </div>
 
-        {role === 'TEACHER' && (
+        {role === 'TEACHER' && assignmentDetails?.studentName && (
           <form onSubmit={handleFeedbackSubmit} className="flex mt-4">
             <input
               type="text"
@@ -152,6 +152,9 @@ const FeedbackView = () => {
               <FaPaperPlane className="mr-1" /> Send
             </button>
           </form>
+        )}
+        {role === 'TEACHER' && !assignmentDetails?.studentName && (
+          <p className="text-red-500 text-center mt-4">Feedback can only be submitted if the thesis is assigned to a student.</p>
         )}
       </div>
     </div>
