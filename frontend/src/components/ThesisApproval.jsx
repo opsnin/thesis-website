@@ -5,18 +5,24 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5174';
 
 const ThesisApproval = () => {
   const [requests, setRequests] = useState([]);
+  const [success, setSuccess] = useState(''); // State for success message
   const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch all thesis requests that need approval
     const fetchRequests = async () => {
-      const response = await fetch(`${backendUrl}/thesis/requests-for-approval`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      const data = await response.json();
-      setRequests(data);
+      try {
+        const response = await fetch(`${backendUrl}/thesis/requests-for-approval`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        if (!response.ok) throw new Error('Failed to fetch requests');
+        const data = await response.json();
+        setRequests(data);
+      } catch (error) {
+        console.error('Error fetching requests:', error);
+      }
     };
     fetchRequests();
   }, []);
@@ -35,6 +41,8 @@ const ThesisApproval = () => {
         setRequests(requests.map(request => 
           request.id === thesisId ? { ...request, approved: true } : request
         ));
+        setSuccess('Thesis approved successfully'); // Set success message
+        setTimeout(() => setSuccess(''), 3000); // Clear message after 3 seconds
       } else {
         console.error('Approval failed');
       }
@@ -51,6 +59,8 @@ const ThesisApproval = () => {
       </header>
 
       <div className="max-w-4xl mx-auto mt-8">
+        {success && <p className="text-green-500 mb-4 text-center">{success}</p>}
+
         {requests.length === 0 ? (
           <p className="text-gray-700 text-center mt-8">
             No pending approvals right now. Check again later.

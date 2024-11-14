@@ -80,7 +80,9 @@ const TeacherThesisView = () => {
                   <p className="text-gray-700">{thesis.description}</p>
                   <p className="text-sm text-gray-600">Due date: {thesis.date}</p>
                   <p className="text-sm text-gray-600 mt-2">
-                    Assigned to: {thesis.requestedBy ? thesis.student?.username : 'Not assigned till now'}
+                    {thesis.approved
+                      ? `Assigned to: ${thesis.student?.username || 'Not assigned to any user'}`
+                      : 'Not assigned to any Student'}
                   </p>
                   <p className="text-sm text-gray-600 mt-2">
                     Last Update: {thesis.lastUpdate ? new Date(thesis.lastUpdate).toLocaleDateString() : 'No updates yet'}

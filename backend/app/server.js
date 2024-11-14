@@ -409,9 +409,9 @@ app.get('/thesis/unassigned', authenticate, authorizeStudent, async (req, res) =
   }
 });
 
-// Route for students to request a thesis
 app.post('/thesis/request', authenticate, authorizeStudent, async (req, res) => {
   const { thesisId } = req.body;
+  console.log('Thesis ID:', thesisId, 'User ID:', req.userId); // Debugging line
   try {
     const thesis = await prisma.thesis.update({
       where: { id: thesisId },
@@ -419,6 +419,7 @@ app.post('/thesis/request', authenticate, authorizeStudent, async (req, res) => 
     });
     res.status(200).json({ message: 'Thesis requested successfully', thesis });
   } catch (error) {
+    console.error('Error requesting thesis:', error);
     res.status(500).json({ message: 'Failed to request thesis' });
   }
 });
