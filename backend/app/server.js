@@ -311,36 +311,36 @@ app.post('/thesis/:thesisId/feedbacks', authenticate, authorizeTeacher, async (r
 //});
 
 // Login route returns token, role, username, and userId
-//app.post('/login', async (req, res) => {
-//    const { email, password } = req.body;
-//  
-//    try {
-//      const user = await prisma.user.findUnique({ where: { email } });
-//      if (!user) {
-//        return res.status(400).json({ message: 'Invalid email or password' });
-//      }
-//  
-//      const isPasswordValid = await bcrypt.compare(password, user.password);
-//      if (!isPasswordValid) {
-//        return res.status(400).json({ message: 'Invalid email or password' });
-//      }
-//  
-//      // Generate JWT token including userId and role
-//      const token = jwt.sign({ userId: user.id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
-//  
-//      // Send user information and token to the client
-//      res.json({ 
-//        message: 'Login successful', 
-//        token, 
-//        role: user.role, 
-//        username: user.username, 
-//        userId: user.id // Include userId in the response
-//      });
-//    } catch (error) {
-//      console.error('Login error:', error);
-//      res.status(500).json({ message: 'Internal server error' });
-//    }
-//  });  
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+  
+    try {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid email or password' });
+      }
+  
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: 'Invalid email or password' });
+      }
+  
+      // Generate JWT token including userId and role
+      const token = jwt.sign({ userId: user.id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
+  
+      // Send user information and token to the client
+      res.json({ 
+        message: 'Login successful', 
+        token, 
+        role: user.role, 
+        username: user.username, 
+        userId: user.id // Include userId in the response
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });  
 
 // Logout route
 app.post('/logout', (req, res) => {
