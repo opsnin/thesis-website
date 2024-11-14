@@ -1,0 +1,47 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  username  String     @unique
+  email     String     @unique
+  password  String
+  role      String
+  theses    Thesis[]   @relation("AddedBy")
+  requests  Thesis[]   @relation("RequestedBy")
+  feedbacks Feedback[] @relation("FeedbackAuthor")
+}
+
+model Thesis {
+  id          Int       @id @default(autoincrement())
+  title       String
+  date        String
+  description String
+  addedBy     Int?
+  requestedBy Int?
+  approved    Boolean   @default(false)
+  submitted   Boolean   @default(false)
+  fileName    String?
+  lastUpdate  DateTime? @updatedAt
+
+  teacher   User?      @relation("AddedBy", fields: [addedBy], references: [id], onDelete: Cascade)
+  student   User?      @relation("RequestedBy", fields: [requestedBy], references: [id], onDelete: Cascade)
+  feedbacks Feedback[] @relation("ThesisFeedback")
+}
+
+model Feedback {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  thesisId  Int
+  userId    Int
+
+  thesis Thesis @relation("ThesisFeedback", fields: [thesisId], references: [id], onDelete: Cascade)
+  author User   @relation("FeedbackAuthor", fields: [userId], references: [id], onDelete: Cascade)
+}

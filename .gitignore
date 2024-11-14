@@ -1,0 +1,5 @@
+# Ignore node_modules folder
+node_modules/
+/backend/app/student-thesis/*
+/backend/prisma/dev.db
+.env
