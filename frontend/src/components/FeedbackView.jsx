@@ -24,7 +24,7 @@ const FeedbackView = () => {
 
   const fetchAssignmentDetails = async () => {
     try {
-      const response = await fetch(`${backendUrl}/thesis/${thesisId}/details`, {
+      const response = await fetch(`${backendUrl}/thesis/thesis/${thesisId}/details`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -39,7 +39,7 @@ const FeedbackView = () => {
 
   const fetchFeedbacks = async () => {
     try {
-      const response = await fetch(`${backendUrl}/thesis/${thesisId}/feedbacks`, {
+      const response = await fetch(`${backendUrl}/thesis/thesis/${thesisId}/feedbacks`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -60,7 +60,7 @@ const FeedbackView = () => {
     }
 
     try {
-      const response = await fetch(`${backendUrl}/thesis/${thesisId}/feedbacks`, {
+      const response = await fetch(`${backendUrl}/thesis/thesis/${thesisId}/feedbacks`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -116,7 +116,7 @@ const FeedbackView = () => {
           </p>
           {assignmentDetails.fileName && (
             <p className="text-gray-700">
-              File: <a href={`${backendUrl}/thesis/files/${assignmentDetails.fileName}`} download className="text-blue-500 underline">
+              File: <a href={`${backendUrl}/thesis/thesis/files/${assignmentDetails.fileName}`} download className="text-blue-500 underline">
                 {assignmentDetails.fileName}
               </a>
             </p>

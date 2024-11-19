@@ -34,7 +34,7 @@ const ThesisCard = ({ thesis, onClick, onDelete }) => (
           <p className="text-sm text-gray-500 mt-2">
             File:
             <a
-              href={`${backendUrl}/student-thesis/${thesis.fileName}`}
+              href={`${backendUrl}/thesis/student-thesis/${thesis.fileName}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 ml-2 underline hover:text-blue-600"
@@ -79,7 +79,7 @@ const TeacherThesisView = () => {
 
   const fetchTheses = async () => {
     try {
-      const response = await fetch(`${backendUrl}/thesis/view`, {
+      const response = await fetch(`${backendUrl}/thesis/thesis/view`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -102,7 +102,7 @@ const TeacherThesisView = () => {
 
   const handleDeleteThesis = async (thesisId) => {
     try {
-      const response = await fetch(`${backendUrl}/thesis/${thesisId}`, {
+      const response = await fetch(`${backendUrl}/thesis/thesis/${thesisId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

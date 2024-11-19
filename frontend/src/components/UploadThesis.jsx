@@ -15,7 +15,7 @@ const UploadThesis = () => {
 
   const fetchAssignedTheses = async () => {
     try {
-      const response = await fetch(`${backendUrl}/thesis/student`, {
+      const response = await fetch(`${backendUrl}/thesis/thesis/student`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -67,7 +67,7 @@ const UploadThesis = () => {
     formData.append('thesisId', selectedThesisId); 
 
     try {
-      const response = await fetch(`${backendUrl}/upload-thesis`, {
+      const response = await fetch(`${backendUrl}/thesis/upload-thesis`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

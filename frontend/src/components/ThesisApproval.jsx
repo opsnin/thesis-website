@@ -12,7 +12,7 @@ const ThesisApproval = () => {
     // Fetch all thesis requests that need approval
     const fetchRequests = async () => {
       try {
-        const response = await fetch(`${backendUrl}/thesis/requests-for-approval`, {
+        const response = await fetch(`${backendUrl}/thesis/thesis/requests-for-approval`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
@@ -29,7 +29,7 @@ const ThesisApproval = () => {
 
   const handleApprove = async (thesisId, studentId) => {
     try {
-      const response = await fetch(`${backendUrl}/thesis/approve`, {
+      const response = await fetch(`${backendUrl}/thesis/thesis/approve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -14,7 +14,7 @@ const TitleRequest = () => {
 
   const fetchTheses = async () => {
     try {
-      const response = await fetch(`${backendUrl}/thesis/unassigned`, {
+      const response = await fetch(`${backendUrl}/thesis/thesis/unassigned`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -41,7 +41,7 @@ const TitleRequest = () => {
     setSuccess('');
 
     try {
-      const response = await fetch(`${backendUrl}/thesis/request`, {
+      const response = await fetch(`${backendUrl}/thesis/thesis/request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

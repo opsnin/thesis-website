@@ -25,7 +25,7 @@ const StudentDashboard = () => {
 
   const fetchStudentTheses = async () => {
     try {
-      const response = await fetch(`${backendUrl}/thesis/student`, {
+      const response = await fetch(`${backendUrl}/thesis/thesis/student`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -45,7 +45,7 @@ const StudentDashboard = () => {
   const initializeUnreadFeedbacks = (theses) => {
     const unreadTracker = {};
     theses.forEach((thesis) => {
-      unreadTracker[thesis.id] = thesis.feedbacks.length; // Initially set all feedback as unread
+      unreadTracker[thesis.id] = thesis.feedbacks.length; 
     });
     setUnreadFeedbacks(unreadTracker);
   };
@@ -53,7 +53,7 @@ const StudentDashboard = () => {
   const checkForNewFeedback = async () => {
     for (const thesis of theses) {
       try {
-        const response = await fetch(`${backendUrl}/thesis/${thesis.id}/feedbacks`, {
+        const response = await fetch(`${backendUrl}/thesis/thesis/${thesis.id}/feedbacks`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
@@ -96,12 +96,12 @@ const StudentDashboard = () => {
       readTracker[thesisId] = 0; // Mark all feedbacks as read by setting count to 0
     });
     setUnreadFeedbacks(readTracker);
-    setNotification(''); // Clear the notification
+    setNotification(''); 
   };
 
   const handleLogout = async () => {
     try {
-      await fetch(`${backendUrl}/logout`, { method: 'POST', credentials: 'include' });
+      await fetch(`${backendUrl}/auth/logout`, { method: 'POST', credentials: 'include' });
       localStorage.removeItem('token');
       localStorage.removeItem('username');
       navigate('/login');

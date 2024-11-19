@@ -19,7 +19,7 @@ const AddTitle = () => {
     setSuccess('');
 
     try {
-      const response = await fetch(`${backendUrl}/thesis/add`, {
+      const response = await fetch(`${backendUrl}/thesis/thesis/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -14,7 +14,7 @@ const TeacherDashboard = () => {
     // Function to check for new thesis requests
     const checkNewRequests = async () => {
       try {
-        const response = await fetch(`${backendUrl}/thesis/requests-for-approval`, {
+        const response = await fetch(`${backendUrl}/thesis/thesis/requests-for-approval`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
@@ -40,7 +40,7 @@ const TeacherDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch(`${backendUrl}/logout`, { method: 'POST', credentials: 'include' });
+      await fetch(`${backendUrl}/auth/logout`, { method: 'POST', credentials: 'include' });
       localStorage.removeItem('token');
       localStorage.removeItem('username');
       navigate('/login');
