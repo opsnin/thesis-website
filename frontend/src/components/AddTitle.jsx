@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5174';
 
 const AddTitle = () => {
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(null);
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -59,12 +61,11 @@ const AddTitle = () => {
             className="w-full p-3 rounded-md border focus:outline-none focus:ring focus:ring-blue-500"
           />
           <div className="relative">
-            <input
-              type="text"
-              placeholder="00/00/0000"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
+            <DatePicker
+              selected={date}
+              onChange={(date) => setDate(date)}
+              dateFormat="MM/dd/yyyy"
+              placeholderText="Due date"
               className="w-full p-3 rounded-md border focus:outline-none focus:ring focus:ring-blue-500"
             />
             <span className="absolute inset-y-0 right-4 flex items-center text-gray-500">

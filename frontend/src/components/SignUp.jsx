@@ -10,7 +10,7 @@ const Signup = () => {
     phone: '',
     password: '',
     rePassword: '',
-    role: '', // No default role
+    role: '',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -57,7 +57,7 @@ const Signup = () => {
           email: formData.email,
           phone: formData.phone,
           password: formData.password,
-          role: formData.role, // Send role to backend
+          role: formData.role,
         }),
       });
 

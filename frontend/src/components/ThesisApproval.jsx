@@ -5,7 +5,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5174';
 
 const ThesisApproval = () => {
   const [requests, setRequests] = useState([]);
-  const [success, setSuccess] = useState(''); // State for success message
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,7 +41,7 @@ const ThesisApproval = () => {
         setRequests(requests.map(request => 
           request.id === thesisId ? { ...request, approved: true } : request
         ));
-        setSuccess('Thesis approved successfully'); // Set success message
+        setSuccess('Thesis approved successfully'); 
         setTimeout(() => setSuccess(''), 3000); // Clear message after 3 seconds
       } else {
         console.error('Approval failed');

@@ -50,7 +50,7 @@ const Login = () => {
       className="fixed inset-0 bg-cover bg-center bg-no-repeat flex items-center justify-center"
       style={{ 
         backgroundImage: "url('/assets/background.jpg')",
-        backgroundColor: '#f0f0f0' // Fallback color for debugging
+        backgroundColor: '#f0f0f0'
       }}
     >
       <div className="bg-white bg-opacity-90 w-80 p-10 rounded-lg shadow-lg text-center">

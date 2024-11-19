@@ -85,7 +85,7 @@ const storage = multer.diskStorage({
           fs.unlinkSync(filePath); // Remove the existing file
         }
   
-        cb(null, newFileName); // Use a consistent file name per user
+        cb(null, newFileName); 
       } catch (err) {
         console.error('Error processing file upload:', err);
         cb(new Error('Database error'), null);
@@ -107,7 +107,7 @@ const storage = multer.diskStorage({
   // Upload thesis endpoint
   app.post('/upload-thesis', authenticate, authorizeStudent, upload.single('file'), async (req, res) => {
     const { userId } = req;
-    const { thesisId } = req.body; // Capture thesisId from the request body
+    const { thesisId } = req.body;
   
     if (!thesisId) {
       return res.status(400).json({ message: 'Thesis ID is required' });
@@ -186,8 +186,8 @@ app.post('/thesis/:thesisId/feedbacks', authenticate, authorizeTeacher, async (r
     const feedback = await prisma.feedback.create({
       data: {
         content,
-        thesisId: parseInt(thesisId), // Ensures thesisId is linked to the existing Thesis entry
-        userId: req.userId, // Use userId from the token (authenticated teacher)
+        thesisId: parseInt(thesisId), 
+        userId: req.userId,
       },
     });
     res.status(201).json({ message: 'Feedback submitted successfully', feedback });
@@ -255,7 +255,7 @@ app.get('/thesis/:thesisId/detailss', authenticate, async (req, res) => {
           thesisId: parseInt(thesisId),
         },
         include: {
-          author: { // Use the relation field as defined in the schema
+          author: { 
             select: {
               username: true,
             },
@@ -283,8 +283,8 @@ app.post('/thesis/:thesisId/feedbacks', authenticate, authorizeTeacher, async (r
       const feedback = await prisma.feedback.create({
         data: {
           content,
-          thesisId: parseInt(thesisId), // Use thesisId directly
-          userId: req.userId, // Use userId from the token (authenticated teacher)
+          thesisId: parseInt(thesisId),
+          userId: req.userId, 
         },
       });
       res.status(201).json({ message: 'Feedback submitted successfully', feedback });
@@ -411,7 +411,7 @@ app.get('/thesis/unassigneds', authenticate, authorizeStudent, async (req, res) 
 
 app.post('/thesis/request', authenticate, authorizeStudent, async (req, res) => {
   const { thesisId } = req.body;
-  console.log('Thesis ID:', thesisId, 'User ID:', req.userId); // Debugging line
+  console.log('Thesis ID:', thesisId, 'User ID:', req.userId);
   try {
     const thesis = await prisma.thesis.update({
       where: { id: thesisId },

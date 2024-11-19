@@ -26,8 +26,8 @@ const UploadThesis = () => {
       }
 
       const data = await response.json();
-      setTheses(data); // Assume data is an array of assigned theses
-      if (data.length > 0) setSelectedThesisId(data[0].id); // Default to the first thesis if available
+      setTheses(data); 
+      if (data.length > 0) setSelectedThesisId(data[0].id);
     } catch (err) {
       setError(err.message);
     }
@@ -64,7 +64,7 @@ const UploadThesis = () => {
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('thesisId', selectedThesisId); // Include selected thesis ID
+    formData.append('thesisId', selectedThesisId); 
 
     try {
       const response = await fetch(`${backendUrl}/upload-thesis`, {

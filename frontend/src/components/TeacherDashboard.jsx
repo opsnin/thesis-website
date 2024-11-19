@@ -33,9 +33,9 @@ const TeacherDashboard = () => {
 
     // Polling for new requests every 30 seconds
     const interval = setInterval(checkNewRequests, 30000);
-    checkNewRequests(); // Initial check on component mount
+    checkNewRequests();
 
-    return () => clearInterval(interval); // Cleanup on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogout = async () => {
@@ -78,7 +78,6 @@ const TeacherDashboard = () => {
         </div>
       </header>
 
-      {/* Banner Image */}
       <div
         className="h-56 bg-cover bg-center"
         style={{

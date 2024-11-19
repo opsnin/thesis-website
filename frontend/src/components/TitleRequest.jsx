@@ -29,7 +29,7 @@ const TitleRequest = () => {
       // Filter only theses that have not been requested yet
       const unassignedTheses = data.filter(thesis => thesis.requestedBy === null);
 
-      console.log('Fetched unassigned theses:', unassignedTheses); // Debugging line
+      console.log('Fetched unassigned theses:', unassignedTheses); 
       setTheses(unassignedTheses);
     } catch (err) {
       setError(err.message || 'Failed to fetch theses');
@@ -56,7 +56,7 @@ const TitleRequest = () => {
 
       const data = await response.json();
       setSuccess('Thesis requested successfully!');
-      fetchTheses(); // Refresh the theses list to update the status
+      fetchTheses(); 
     } catch (err) {
       setError(err.message || 'Failed to request thesis');
     }
