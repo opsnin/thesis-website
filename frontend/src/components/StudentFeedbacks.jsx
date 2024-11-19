@@ -8,14 +8,14 @@ const StudentFeedbacks = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <header className="bg-blue-800 text-white p-4 flex justify-between items-center">
-        <h1 className="text-lg font-semibold">Feedback for Assigned Theses</h1>
-        <button
+      <header className="bg-blue-800 text-white p-4 flex items-center">
+        <span
           onClick={() => navigate('/student-dashboard')}
-          className="bg-white text-blue-800 px-4 py-2 rounded hover:bg-gray-200 transition"
+          className="cursor-pointer text-white hover:underline mr-4"
         >
-          Go to Homepage
-        </button>
+          Home
+        </span>
+        <h1 className="text-lg font-semibold">Feedback for Assigned Theses</h1>
       </header>
       
       {theses.length > 0 ? (
