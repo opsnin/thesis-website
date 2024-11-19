@@ -215,8 +215,8 @@ app.get('/thesis/student', authenticate, async (req, res) => {
     }
   });
   
-// Backend route to fetch thesis details with assignment information #need change
-app.get('/thesis/:thesisId/detailss', authenticate, async (req, res) => {
+// Backend route to fetch thesis details with assignment information
+app.get('/thesis/:thesisId/details', authenticate, async (req, res) => {
     const { thesisId } = req.params;
   
     try {
@@ -244,9 +244,7 @@ app.get('/thesis/:thesisId/detailss', authenticate, async (req, res) => {
     }
   });
   
-   // need to change
-
-  app.get('/thesis/:thesisId/feedbackss', authenticate, async (req, res) => {
+  app.get('/thesis/:thesisId/feedbacks', authenticate, async (req, res) => {
     const { thesisId } = req.params;
   
     try {
@@ -383,8 +381,8 @@ app.post('/thesis/add', authenticate, authorizeTeacher, async (req, res) => {
   }
 });
 
-// Route to fetch all thesis titles with their status (for teachers) #need
-app.get('/thesis/views', authenticate, authorizeTeacher, async (req, res) => {
+// Route to fetch all thesis titles with their status (for teachers)
+app.get('/thesis/view', authenticate, authorizeTeacher, async (req, res) => {
   try {
     const theses = await prisma.thesis.findMany({
       include: {
@@ -397,8 +395,8 @@ app.get('/thesis/views', authenticate, authorizeTeacher, async (req, res) => {
   }
 });
 
-// Route for students to fetch unassigned thesis titles #need
-app.get('/thesis/unassigneds', authenticate, authorizeStudent, async (req, res) => {
+// Route for students to fetch unassigned thesis titles
+app.get('/thesis/unassigned', authenticate, authorizeStudent, async (req, res) => {
   try {
     const theses = await prisma.thesis.findMany({
       where: { requestedBy: null },
@@ -424,8 +422,8 @@ app.post('/thesis/request', authenticate, authorizeStudent, async (req, res) => 
   }
 });
 
-// Route to fetch thesis requests that need teacher approval #need to change
-app.get('/thesis/requests-for-approvals', authenticate, authorizeTeacher, async (req, res) => {
+// Route to fetch thesis requests that need teacher approval
+app.get('/thesis/requests-for-approval', authenticate, authorizeTeacher, async (req, res) => {
   try {
     const thesisRequests = await prisma.thesis.findMany({
       where: {

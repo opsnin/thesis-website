@@ -7,11 +7,20 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5174';
 const StudentDashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [theses, setTheses] = useState([]);
+  const [notification, setNotification] = useState('');
+  const [unreadFeedbacks, setUnreadFeedbacks] = useState({});
   const username = localStorage.getItem('username') || 'Student';
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchStudentTheses();
+
+    // Polling every 10 seconds for new feedback
+    const interval = setInterval(() => {
+      checkForNewFeedback();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchStudentTheses = async () => {
@@ -24,12 +33,70 @@ const StudentDashboard = () => {
       if (response.ok) {
         const thesesData = await response.json();
         setTheses(thesesData || []);
+        initializeUnreadFeedbacks(thesesData);
       } else {
         console.error('Failed to fetch theses data');
       }
     } catch (error) {
       console.error('Error fetching theses:', error);
     }
+  };
+
+  const initializeUnreadFeedbacks = (theses) => {
+    const unreadTracker = {};
+    theses.forEach((thesis) => {
+      unreadTracker[thesis.id] = thesis.feedbacks.length; // Initially set all feedback as unread
+    });
+    setUnreadFeedbacks(unreadTracker);
+  };
+
+  const checkForNewFeedback = async () => {
+    for (const thesis of theses) {
+      try {
+        const response = await fetch(`${backendUrl}/thesis/${thesis.id}/feedbacks`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+
+        if (response.ok) {
+          const feedbacksData = await response.json();
+          const currentFeedbackCount = feedbacksData.length;
+
+          // Check if there is new feedback by comparing with previous count
+          if (currentFeedbackCount > (unreadFeedbacks[thesis.id] || 0)) {
+            const latestFeedback = feedbacksData[feedbacksData.length - 1];
+            setNotification(`${latestFeedback.author.username} has given feedback for ${thesis.title}`);
+            setUnreadFeedbacks((prev) => ({
+              ...prev,
+              [thesis.id]: currentFeedbackCount,
+            }));
+          }
+        } else {
+          console.error('Failed to fetch feedback for thesis', thesis.id);
+        }
+      } catch (error) {
+        console.error('Error fetching feedback for thesis:', thesis.id, error);
+      }
+    }
+  };
+
+  const handleFeedbackClick = () => {
+    if (theses.length > 0) {
+      markAllFeedbacksAsRead();
+      navigate('/student-feedbacks', { state: { theses } });
+    } else {
+      alert("No thesis assigned yet");
+    }
+  };
+
+  const markAllFeedbacksAsRead = () => {
+    const readTracker = { ...unreadFeedbacks };
+    Object.keys(readTracker).forEach((thesisId) => {
+      readTracker[thesisId] = 0; // Mark all feedbacks as read by setting count to 0
+    });
+    setUnreadFeedbacks(readTracker);
+    setNotification(''); // Clear the notification
   };
 
   const handleLogout = async () => {
@@ -40,14 +107,6 @@ const StudentDashboard = () => {
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
-    }
-  };
-
-  const handleFeedbackClick = () => {
-    if (theses.length > 0) {
-      navigate('/student-feedbacks', { state: { theses } });
-    } else {
-      alert("No thesis assigned yet");
     }
   };
 
@@ -78,6 +137,19 @@ const StudentDashboard = () => {
           )}
         </div>
       </header>
+
+      {/* Notification Alert */}
+      {notification && (
+        <div className="fixed top-16 right-4 bg-yellow-200 text-yellow-800 px-4 py-2 rounded-md shadow-lg">
+          <p>{notification}</p>
+          <button
+            onClick={() => setNotification('')}
+            className="text-yellow-600 underline text-sm mt-1"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="h-56 bg-cover bg-center" style={{ backgroundImage: "url('/assets/library.jpg')" }}></div>
 

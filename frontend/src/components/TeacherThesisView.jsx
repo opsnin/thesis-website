@@ -1,7 +1,72 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaTrash } from 'react-icons/fa';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5174';
+
+// Header Component
+const Header = ({ onBack, title }) => (
+  <header className="bg-blue-800 text-white p-4 flex items-center justify-between rounded-lg shadow-lg">
+    <button onClick={onBack} className="text-lg text-white hover:text-gray-200 transition-colors">
+      &#8592; Home
+    </button>
+    <h1 className="text-lg font-semibold">{title}</h1>
+  </header>
+);
+
+// ThesisCard Component
+const ThesisCard = ({ thesis, onClick, onDelete }) => (
+  <div className="bg-gray-100 p-6 rounded-lg mb-6 shadow-lg hover:shadow-xl transition-shadow">
+    <div className="flex justify-between items-start">
+      <div className="cursor-pointer flex-1" onClick={() => onClick(thesis.id)}>
+        <h2 className="text-xl font-bold text-blue-700 mb-2">{thesis.title}</h2>
+        <p className="text-gray-600 mb-2">{thesis.description}</p>
+        <p className="text-sm text-gray-500 mb-1">Due date: {thesis.date}</p>
+        <p className="text-sm text-gray-500 mb-1">
+          {thesis.approved
+            ? `Assigned to: ${thesis.student?.username || 'Not assigned to any user'}`
+            : 'Not assigned to any Student'}
+        </p>
+        <p className="text-sm text-gray-500 mb-1">
+          Last Update: {thesis.lastUpdate ? new Date(thesis.lastUpdate).toLocaleDateString() : 'No updates yet'}
+        </p>
+        {thesis.fileName && (
+          <p className="text-sm text-gray-500 mt-2">
+            File:
+            <a
+              href={`${backendUrl}/student-thesis/${thesis.fileName}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 ml-2 underline hover:text-blue-600"
+            >
+              Download
+            </a>
+          </p>
+        )}
+      </div>
+      <button
+        onClick={() => onDelete(thesis.id)}
+        className="bg-red-500 text-white p-2 rounded-full shadow-md hover:bg-red-600 transition-colors"
+        title="Delete"
+      >
+        <FaTrash className="text-lg" />
+      </button>
+    </div>
+  </div>
+);
+
+// ThesisList Component
+const ThesisList = ({ theses, onThesisClick, onDelete }) => (
+  <div className="max-w-3xl mx-auto mt-8 p-4 bg-white rounded-lg shadow-lg">
+    {theses.length === 0 ? (
+      <p className="text-gray-700 text-center mt-8 text-lg">No thesis titles available.</p>
+    ) : (
+      theses.map((thesis) => (
+        <ThesisCard key={thesis.id} thesis={thesis} onClick={onThesisClick} onDelete={onDelete} />
+      ))
+    )}
+  </div>
+);
 
 const TeacherThesisView = () => {
   const [theses, setTheses] = useState([]);
@@ -55,63 +120,16 @@ const TeacherThesisView = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <header className="bg-blue-800 text-white p-4 flex items-center">
-        <button onClick={() => window.history.back()} className="mr-4 text-lg">&#8592; Home</button>
-        <h1 className="text-lg font-semibold">Thesis</h1>
-      </header>
+    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-gray-100 p-8">
+      <Header title="Thesis Management" onBack={() => navigate(-1)} />
       
-      <div className="max-w-2xl mx-auto mt-8">
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-
-        {theses.length === 0 ? (
-          <p className="text-gray-700 text-center mt-8">
-            No thesis titles available.
-          </p>
-        ) : (
-          theses.map((thesis) => (
-            <div
-              key={thesis.id}
-              className="bg-gray-200 p-4 rounded-lg mb-4 shadow-md"
-            >
-              <div className="flex justify-between items-center">
-                <div className="cursor-pointer" onClick={() => handleThesisClick(thesis.id)}>
-                  <h2 className="text-lg font-semibold text-blue-800">{thesis.title}</h2>
-                  <p className="text-gray-700">{thesis.description}</p>
-                  <p className="text-sm text-gray-600">Due date: {thesis.date}</p>
-                  <p className="text-sm text-gray-600 mt-2">
-                    {thesis.approved
-                      ? `Assigned to: ${thesis.student?.username || 'Not assigned to any user'}`
-                      : 'Not assigned to any Student'}
-                  </p>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Last Update: {thesis.lastUpdate ? new Date(thesis.lastUpdate).toLocaleDateString() : 'No updates yet'}
-                  </p>
-                  {thesis.fileName && (
-                    <p className="text-sm text-gray-600 mt-2">
-                      File: {thesis.fileName}
-                      <a
-                        href={`${backendUrl}/student-thesis/${thesis.fileName}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 ml-2"
-                      >
-                        Download
-                      </a>
-                    </p>
-                  )}
-                </div>
-                <button
-                  onClick={() => handleDeleteThesis(thesis.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      {error && (
+        <p className="text-red-500 text-center mt-4 font-semibold">
+          {error}
+        </p>
+      )}
+      
+      <ThesisList theses={theses} onThesisClick={handleThesisClick} onDelete={handleDeleteThesis} />
     </div>
   );
 };
