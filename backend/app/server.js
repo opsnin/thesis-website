@@ -13,7 +13,7 @@ const PORT = 5174;
 // Enable CORS for requests from the frontend
 app.use(cors({
   origin: 'http://localhost:5173',
-  methods: ['GET', 'POST', 'DELETE'],
+  methods: ['GET', 'POST', 'DELETE','PUT'],
   credentials: true
 }));
 

@@ -62,6 +62,19 @@ const TitleRequest = () => {
     }
   };
 
+  const isDueDateNear = (dueDate) => {
+    const today = new Date();
+    const due = new Date(dueDate);
+    const diffInDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+    return diffInDays <= 7 && diffInDays >= 0; // "Near" if the due date is within 7 days and not past
+  };
+
+  const isPastDueDate = (dueDate) => {
+    const today = new Date();
+    const due = new Date(dueDate);
+    return today > due; // Returns true if the current date is past the due date
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <header className="bg-blue-800 text-white p-4 flex items-center">
@@ -82,13 +95,19 @@ const TitleRequest = () => {
             <div key={thesis.id} className="bg-gray-200 p-4 rounded-lg mb-4 shadow-md">
               <h2 className="text-lg font-semibold text-blue-800">{thesis.title}</h2>
               <p className="text-gray-700">{thesis.description}</p>
-              <p className="text-sm text-gray-600">Due date: {thesis.date}</p>
-              <button
-                onClick={() => handleRequest(thesis.id)}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
-              >
-                Request
-              </button>
+              <p className={`text-sm ${isDueDateNear(thesis.date) ? 'text-red-500' : isPastDueDate(thesis.date) ? 'text-gray-400' : 'text-green-500'}`}>
+                Due date: {new Date(thesis.date).toLocaleDateString()}
+              </p>
+              {isPastDueDate(thesis.date) ? (
+                <p className="text-red-500 text-sm mt-2">Time for requesting this title is finished</p>
+              ) : (
+                <button
+                  onClick={() => handleRequest(thesis.id)}
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
+                >
+                  Request
+                </button>
+              )}
             </div>
           ))
         )}

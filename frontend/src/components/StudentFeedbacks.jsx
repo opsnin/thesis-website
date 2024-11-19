@@ -1,44 +1,88 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const StudentFeedbacks = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const theses = location.state?.theses || [];
+  const [selectedThesis, setSelectedThesis] = useState(null);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <header className="bg-blue-800 text-white p-4 flex items-center">
-        <span
-          onClick={() => navigate('/student-dashboard')}
-          className="cursor-pointer text-white hover:underline mr-4"
-        >
-          Home
-        </span>
-        <h1 className="text-lg font-semibold">Feedback for Assigned Theses</h1>
-      </header>
-      
-      {theses.length > 0 ? (
-        theses.map((thesis) => (
-          <div key={thesis.id} className="max-w-2xl mx-auto mt-8 bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-blue-800 mb-2">{thesis.title}</h2>
-            <div className="mt-4">
-              {thesis.feedbacks.length > 0 ? (
-                thesis.feedbacks.map((feedback) => (
-                  <div key={feedback.id} className="p-4 border-b border-gray-200">
-                    <p><strong>{feedback.author.username}:</strong> {feedback.content}</p>
-                    <p className="text-gray-500 text-sm">{new Date(feedback.createdAt).toLocaleString()}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500">No feedback available for this thesis.</p>
-              )}
+    <div
+      className="min-h-screen flex flex-col items-center p-8 bg-cover bg-center bg-fixed"
+      style={{
+        backgroundImage: "url('/assets/background.jpg')",
+      }}
+    >
+      <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg">
+        <header className="bg-blue-700 text-white p-6 flex items-center rounded-t-lg">
+          <button
+            onClick={() => navigate('/student-dashboard')}
+            className="text-white hover:underline mr-4"
+          >
+            &larr; Back to Home
+          </button>
+          <h1 className="text-xl font-semibold">Assigned Theses</h1>
+        </header>
+
+        <div className="p-6">
+          {selectedThesis ? (
+            <>
+              <button
+                onClick={() => setSelectedThesis(null)}
+                className="text-blue-600 hover:underline mb-4"
+              >
+                &larr; Back to Theses
+              </button>
+              <h2 className="text-xl font-semibold text-blue-700 mb-4">
+                {selectedThesis.title}
+              </h2>
+              <div className="space-y-4">
+                {selectedThesis.feedbacks.length > 0 ? (
+                  selectedThesis.feedbacks.map((feedback, index) => (
+                    <div
+                      key={feedback.id}
+                      className={`flex items-start ${
+                        feedback.author.username === selectedThesis.feedbacks[0].author.username
+                          ? 'justify-start'
+                          : 'justify-end'
+                      }`}
+                    >
+                      <div
+                        className={`max-w-md p-4 rounded-lg shadow ${
+                          feedback.author.username === selectedThesis.feedbacks[0].author.username
+                            ? 'bg-blue-100 text-gray-800 rounded-tl-none'
+                            : 'bg-green-100 text-gray-800 rounded-tr-none'
+                        }`}
+                      >
+                        <p className="font-medium">{feedback.author.username}</p>
+                        <p className="mt-1">{feedback.content}</p>
+                        <p className="text-gray-500 text-sm mt-1">
+                          {new Date(feedback.createdAt).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic">No feedback available for this thesis.</p>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="space-y-4">
+              {theses.map((thesis) => (
+                <div
+                  key={thesis.id}
+                  onClick={() => setSelectedThesis(thesis)}
+                  className="p-4 bg-gray-100 rounded-lg shadow-md hover:bg-blue-100 transition cursor-pointer"
+                >
+                  <h2 className="text-lg font-semibold text-blue-700">{thesis.title}</h2>
+                </div>
+              ))}
             </div>
-          </div>
-        ))
-      ) : (
-        <p className="text-center mt-8 text-gray-500">No theses assigned yet.</p>
-      )}
+          )}
+        </div>
+      </div>
     </div>
   );
 };

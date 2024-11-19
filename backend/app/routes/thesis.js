@@ -306,5 +306,26 @@ router.post('/thesis/approve', authenticate, authorizeTeacher, async (req, res) 
         res.status(500).json({ message: 'Failed to approve thesis' });
     }
 });
+// Update thesis due date by ID
+router.put('/thesis/:thesisId/due-date', authenticate, authorizeTeacher, async (req, res) => {
+    const { thesisId } = req.params;
+    const { date } = req.body;
+
+    if (!date) {
+        return res.status(400).json({ message: 'Due date is required' });
+    }
+
+    try {
+        const updatedThesis = await prisma.thesis.update({
+            where: { id: parseInt(thesisId) },
+            data: { date },
+        });
+        console.log('Thesis due date updated successfully:', thesisId);
+        res.status(200).json({ message: 'Due date updated successfully', updatedThesis });
+    } catch (error) {
+        console.error('Failed to update due date:', error);
+        res.status(500).json({ message: 'Failed to update due date' });
+    }
+});
 
 module.exports = router;
