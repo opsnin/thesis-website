@@ -23,8 +23,8 @@ app.use('/thesis/thesis/files', express.static(path.join(__dirname, 'student-the
 // Parse JSON body
 app.use(bodyParser.json());
 
-// Mount routes
+// Mount routes #need update
 app.use('/auth', authRoutes);
-app.use('/thesis', thesisRoutes);
+app.use('/thesiss', thesisRoutes);
 
 app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
