@@ -1,21 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaBell, FaFileAlt, FaPlusSquare, FaUserCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5174';
+
 const TeacherDashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const username = localStorage.getItem('username') || 'Teacher'; // Retrieve username from localStorage
+  const [newRequestNotification, setNewRequestNotification] = useState(false);
+  const username = localStorage.getItem('username') || 'Teacher';
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Function to check for new thesis requests
+    const checkNewRequests = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/thesis/requests-for-approval`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        if (!response.ok) throw new Error('Failed to fetch requests');
+        const data = await response.json();
+        
+        // Show notification if there are pending approvals
+        if (data.length > 0) {
+          setNewRequestNotification(true);
+        }
+      } catch (error) {
+        console.error('Error fetching new requests:', error);
+      }
+    };
+
+    // Polling for new requests every 30 seconds
+    const interval = setInterval(checkNewRequests, 30000);
+    checkNewRequests(); // Initial check on component mount
+
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, []);
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:5174/logout', { method: 'POST', credentials: 'include' });
-
-      // Clear local storage or any stored authentication data
+      await fetch(`${backendUrl}/logout`, { method: 'POST', credentials: 'include' });
       localStorage.removeItem('token');
       localStorage.removeItem('username');
-      
-      // Redirect to login page
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -59,23 +86,44 @@ const TeacherDashboard = () => {
         }}
       ></div>
 
-      {/* Action Cards */}
-      <div className="p-8 flex justify-center space-x-6">
-        <ActionCard
-          icon={<FaBell className="text-red-500 text-4xl" />}
-          title="Title Request"
-          onClick={() => navigate('/teacher-dashboard/thesis-approval')}
-        />
-        <ActionCard
-          icon={<FaFileAlt className="text-blue-500 text-4xl" />}
-          title="Thesis"
-          onClick={() => navigate('/teacher-dashboard/teacher-thesis-view')} // Updated path
-        />
-        <ActionCard
-          icon={<FaPlusSquare className="text-yellow-500 text-4xl" />}
-          title="Add Title"
-          onClick={() => navigate('/teacher-dashboard/add-title')}
-        />
+      {/* Main Content */}
+      <div className="p-8 flex flex-col items-center space-y-4">
+        {/* Action Cards and Notification */}
+        <div className="flex flex-col items-center space-y-4">
+          {/* Notification above "Title Request" */}
+          {newRequestNotification && (
+            <div className="w-full max-w-lg bg-red-600 text-white px-4 py-2 rounded-md shadow-lg text-center mb-4">
+              <p>New thesis approval requests pending!</p>
+              <button
+                onClick={() => {
+                  setNewRequestNotification(false);
+                  navigate('/teacher-dashboard/thesis-approval');
+                }}
+                className="mt-2 underline"
+              >
+                View Requests
+              </button>
+            </div>
+          )}
+          
+          <div className="flex justify-center space-x-6">
+            <ActionCard
+              icon={<FaBell className="text-red-500 text-4xl" />}
+              title="Title Request"
+              onClick={() => navigate('/teacher-dashboard/thesis-approval')}
+            />
+            <ActionCard
+              icon={<FaFileAlt className="text-blue-500 text-4xl" />}
+              title="Thesis"
+              onClick={() => navigate('/teacher-dashboard/teacher-thesis-view')}
+            />
+            <ActionCard
+              icon={<FaPlusSquare className="text-yellow-500 text-4xl" />}
+              title="Add Title"
+              onClick={() => navigate('/teacher-dashboard/add-title')}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
