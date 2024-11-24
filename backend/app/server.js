@@ -25,6 +25,6 @@ app.use(bodyParser.json());
 
 // Mount routes #need update
 app.use('/auth', authRoutes);
-app.use('/thesiss', thesisRoutes);
+app.use('/thesis', thesisRoutes);
 
 app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
