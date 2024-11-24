@@ -15,6 +15,7 @@ To install the dependencies for both the frontend and backend, follow these step
     ```bash
     cd backend
     npm install
+    cp env.sample .env
     ```
 
 2. Navigate back to the root directory and then to the frontend directory:
@@ -28,10 +29,6 @@ To install the dependencies for both the frontend and backend, follow these step
     ```bash
     cd ..
     npm install
-    ```
-4. Create .env
-    ```bash
-   cp env.sample .env
     ```
 The application uses the `concurrently` package to run both the backend and frontend servers simultaneously.
 
