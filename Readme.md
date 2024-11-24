@@ -16,6 +16,7 @@ To install the dependencies for both the frontend and backend, follow these step
     cd backend
     npm install
     cp env.sample .env
+    npx prisma generate
     ```
 
 2. Navigate back to the root directory and then to the frontend directory:
