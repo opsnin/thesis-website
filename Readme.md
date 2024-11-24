@@ -29,7 +29,10 @@ To install the dependencies for both the frontend and backend, follow these step
     cd ..
     npm install
     ```
-
+4. Create .env
+    ```bash
+   cp env.sample .env
+    ```
 The application uses the `concurrently` package to run both the backend and frontend servers simultaneously.
 
 ## Running the Application
