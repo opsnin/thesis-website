@@ -19,21 +19,23 @@ model User {
 }
 
 model Thesis {
-  id          Int       @id @default(autoincrement())
-  title       String
-  date        String
-  description String
-  addedBy     Int?
-  requestedBy Int?
-  approved    Boolean   @default(false)
-  submitted   Boolean   @default(false)
-  fileName    String?
-  lastUpdate  DateTime? @updatedAt
+  id             Int       @id @default(autoincrement())
+  title          String
+  requestDueDate String     // New field for the due date to request the title
+  thesisDueDate  String     // New field for the due date for the thesis
+  description    String
+  addedBy        Int?
+  requestedBy    Int?
+  approved       Boolean    @default(false)
+  submitted      Boolean    @default(false)
+  fileName       String?
+  lastUpdate     DateTime?  @updatedAt
 
   teacher   User?      @relation("AddedBy", fields: [addedBy], references: [id], onDelete: Cascade)
   student   User?      @relation("RequestedBy", fields: [requestedBy], references: [id], onDelete: Cascade)
   feedbacks Feedback[] @relation("ThesisFeedback")
 }
+
 
 model Feedback {
   id        Int      @id @default(autoincrement())

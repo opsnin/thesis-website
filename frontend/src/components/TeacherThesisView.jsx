@@ -19,14 +19,18 @@ const Header = ({ onBack, title }) => (
 // ThesisCard Component
 const ThesisCard = ({ thesis, onClick, onDelete, onDueDateUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [dueDate, setDueDate] = useState(new Date(thesis.date));
+  const [requestDueDate, setRequestDueDate] = useState(new Date(thesis.requestDueDate));
+  const [thesisDueDate, setThesisDueDate] = useState(new Date(thesis.thesisDueDate));
 
   const handleEditClick = () => {
     setIsEditing(!isEditing);
   };
 
   const handleSaveClick = () => {
-    onDueDateUpdate(thesis.id, dueDate.toISOString().split('T')[0]); // Format date to 'YYYY-MM-DD'
+    onDueDateUpdate(thesis.id, {
+      requestDueDate: requestDueDate.toISOString().split('T')[0],
+      thesisDueDate: thesisDueDate.toISOString().split('T')[0],
+    });
     setIsEditing(false);
   };
 
@@ -36,18 +40,32 @@ const ThesisCard = ({ thesis, onClick, onDelete, onDueDateUpdate }) => {
         <div className="cursor-pointer flex-1" onClick={!isEditing ? () => onClick(thesis.id) : undefined}>
           <h2 className="text-xl font-bold text-blue-700 mb-2">{thesis.title}</h2>
           <p className="text-gray-600 mb-2">{thesis.description}</p>
-          
-          <div className="flex items-center mb-2">
-            <p className="text-sm text-gray-500 mr-2">Due date:</p>
+
+          <div className="mb-2">
+            <p className="text-sm text-gray-500">Request Due Date:</p>
             {isEditing ? (
               <DatePicker
-                selected={dueDate}
-                onChange={(date) => setDueDate(date)}
+                selected={requestDueDate}
+                onChange={(date) => setRequestDueDate(date)}
                 className="border rounded p-1 text-gray-700"
                 dateFormat="yyyy-MM-dd"
               />
             ) : (
-              <p className="text-sm text-gray-500">{new Date(dueDate).toLocaleDateString()}</p>
+              <p className="text-sm text-gray-500">{new Date(thesis.requestDueDate).toLocaleDateString()}</p>
+            )}
+          </div>
+
+          <div className="mb-2">
+            <p className="text-sm text-gray-500">Thesis Due Date:</p>
+            {isEditing ? (
+              <DatePicker
+                selected={thesisDueDate}
+                onChange={(date) => setThesisDueDate(date)}
+                className="border rounded p-1 text-gray-700"
+                dateFormat="yyyy-MM-dd"
+              />
+            ) : (
+              <p className="text-sm text-gray-500">{new Date(thesis.thesisDueDate).toLocaleDateString()}</p>
             )}
           </div>
 
@@ -73,7 +91,7 @@ const ThesisCard = ({ thesis, onClick, onDelete, onDueDateUpdate }) => {
             </p>
           )}
         </div>
-        
+
         <div className="flex items-center">
           {isEditing ? (
             <button
@@ -176,31 +194,33 @@ const TeacherThesisView = () => {
     }
   };
 
-  const handleDueDateUpdate = async (thesisId, newDate) => {
+  const handleDueDateUpdate = async (thesisId, dates) => {
     try {
-        const response = await fetch(`${backendUrl}/thesis/thesis/${thesisId}/due-date`, {
-            method: 'PUT', // Use PUT method for updating the due date
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
-            body: JSON.stringify({ date: newDate }),
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to update due date');
-        }
-
-        setTheses((prevTheses) =>
-            prevTheses.map((thesis) =>
-                thesis.id === thesisId ? { ...thesis, date: newDate } : thesis
-            )
-        );
-        setSuccess('Due date updated successfully!');
+      const response = await fetch(`${backendUrl}/thesis/thesis/${thesisId}/due-dates`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(dates),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update due dates');
+      }
+  
+      setTheses((prevTheses) =>
+        prevTheses.map((thesis) =>
+          thesis.id === thesisId
+            ? { ...thesis, requestDueDate: dates.requestDueDate, thesisDueDate: dates.thesisDueDate }
+            : thesis
+        )
+      );
+      setSuccess('Due dates updated successfully!');
     } catch (err) {
-        setError('Failed to update due date');
+      setError('Failed to update due dates');
     }
-};
+  };  
 
 
   return (

@@ -85,7 +85,7 @@ const TitleRequest = () => {
       <div className="max-w-2xl mx-auto mt-8">
         {error && <p className="text-red-500 mb-4">{error}</p>}
         {success && <p className="text-green-500 mb-4">{success}</p>}
-
+  
         {theses.length === 0 ? (
           <p className="text-gray-700 text-center mt-8">
             No titles found that are free or unassigned. Please contact your teacher for further assistance.
@@ -95,10 +95,16 @@ const TitleRequest = () => {
             <div key={thesis.id} className="bg-gray-200 p-4 rounded-lg mb-4 shadow-md">
               <h2 className="text-lg font-semibold text-blue-800">{thesis.title}</h2>
               <p className="text-gray-700">{thesis.description}</p>
-              <p className={`text-sm ${isDueDateNear(thesis.date) ? 'text-red-500' : isPastDueDate(thesis.date) ? 'text-gray-400' : 'text-green-500'}`}>
-                Due date: {new Date(thesis.date).toLocaleDateString()}
+              <p className="text-sm text-gray-500">
+                Request Due Date: {new Date(thesis.requestDueDate).toLocaleDateString()}
               </p>
-              {isPastDueDate(thesis.date) ? (
+              <p className="text-sm text-gray-500">
+                Thesis Due Date: {new Date(thesis.thesisDueDate).toLocaleDateString()}
+              </p>
+              <p className={`text-sm ${isDueDateNear(thesis.requestDueDate) ? 'text-red-500' : isPastDueDate(thesis.requestDueDate) ? 'text-gray-400' : 'text-green-500'}`}>
+                Request Deadline Status: {isPastDueDate(thesis.requestDueDate) ? 'Past Due' : isDueDateNear(thesis.requestDueDate) ? 'Approaching' : 'On Time'}
+              </p>
+              {isPastDueDate(thesis.requestDueDate) ? (
                 <p className="text-red-500 text-sm mt-2">Time for requesting this title is finished</p>
               ) : (
                 <button
@@ -114,6 +120,7 @@ const TitleRequest = () => {
       </div>
     </div>
   );
+  
 };
 
 export default TitleRequest;

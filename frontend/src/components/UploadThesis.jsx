@@ -6,12 +6,19 @@ const UploadThesis = () => {
   const [file, setFile] = useState(null);
   const [theses, setTheses] = useState([]);
   const [selectedThesisId, setSelectedThesisId] = useState('');
+  const [selectedThesis, setSelectedThesis] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
     fetchAssignedTheses();
   }, []);
+
+  useEffect(() => {
+    // Automatically update `selectedThesis` when `selectedThesisId` changes
+    const thesis = theses.find((t) => t.id === parseInt(selectedThesisId));
+    setSelectedThesis(thesis || null);
+  }, [selectedThesisId, theses]);
 
   const fetchAssignedTheses = async () => {
     try {
@@ -26,8 +33,11 @@ const UploadThesis = () => {
       }
 
       const data = await response.json();
-      setTheses(data); 
-      if (data.length > 0) setSelectedThesisId(data[0].id);
+      setTheses(data);
+
+      if (data.length > 0) {
+        setSelectedThesisId(data[0].id); // Automatically select the first thesis
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -62,9 +72,14 @@ const UploadThesis = () => {
       return;
     }
 
+    if (selectedThesis && new Date(selectedThesis.thesisDueDate) < new Date()) {
+      setError('The due date to submit this thesis has passed. Submission is not allowed.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('thesisId', selectedThesisId); 
+    formData.append('thesisId', selectedThesisId);
 
     try {
       const response = await fetch(`${backendUrl}/thesis/upload-thesis`, {
@@ -84,6 +99,10 @@ const UploadThesis = () => {
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const isDueDatePassed = (dueDate) => {
+    return new Date(dueDate) < new Date();
   };
 
   return (
@@ -112,6 +131,18 @@ const UploadThesis = () => {
             ))}
           </select>
 
+          {selectedThesis && (
+            <div className="p-4 mt-4 bg-gray-100 border rounded-lg">
+              <p className="text-sm text-gray-700">
+                <strong>Due Date to Submit:</strong>{' '}
+                {new Date(selectedThesis.thesisDueDate).toLocaleDateString()}
+              </p>
+              {isDueDatePassed(selectedThesis.thesisDueDate) && (
+                <p className="text-red-500 mt-2">Due date passed</p>
+              )}
+            </div>
+          )}
+
           <input
             type="file"
             accept=".pdf,.docx"
@@ -119,7 +150,15 @@ const UploadThesis = () => {
             className="w-full p-3 rounded-md border focus:outline-none focus:ring focus:ring-blue-500"
           />
 
-          <button type="submit" className="w-full p-3 bg-blue-600 text-white rounded-md hover:bg-blue-500">
+          <button
+            type="submit"
+            className={`w-full p-3 rounded-md ${
+              selectedThesis && isDueDatePassed(selectedThesis.thesisDueDate)
+                ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-500'
+            }`}
+            disabled={selectedThesis && isDueDatePassed(selectedThesis.thesisDueDate)}
+          >
             Upload Thesis
           </button>
         </form>

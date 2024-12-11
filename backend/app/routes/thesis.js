@@ -182,14 +182,15 @@ router.get('/thesis/:thesisId/feedbacks', authenticate, async (req, res) => {
 
 // Route for teachers to create a thesis title
 router.post('/thesis/add', authenticate, authorizeTeacher, async (req, res) => {
-    const { title, date, description } = req.body;
-    console.log('Adding thesis title:', { title, date, description });
+    const { title, requestDueDate, thesisDueDate, description } = req.body;
+    console.log('Adding thesis title:', { title, requestDueDate, thesisDueDate, description });
 
     try {
         const thesis = await prisma.thesis.create({
             data: {
                 title,
-                date,
+                requestDueDate,
+                thesisDueDate,
                 description,
                 addedBy: req.userId,
             },
@@ -202,23 +203,51 @@ router.post('/thesis/add', authenticate, authorizeTeacher, async (req, res) => {
     }
 });
 
+
 // Route to fetch all thesis titles with their status (for teachers)
 router.get('/thesis/view', authenticate, authorizeTeacher, async (req, res) => {
     console.log('Fetching all thesis titles for teacher view');
 
     try {
         const theses = await prisma.thesis.findMany({
-            include: {
-                student: { select: { username: true } },
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                requestDueDate: true,
+                thesisDueDate: true,
+                approved: true,
+                submitted: true,
+                fileName: true,
+                lastUpdate: true,
+                student: {
+                    select: { username: true },
+                },
             },
         });
-        console.log('Fetched theses:', theses.length);
-        res.json(theses);
+
+        console.log('Fetched theses count:', theses.length);
+
+        // Debugging individual thesis details (optional)
+        theses.forEach((thesis, index) => {
+            console.log(`Thesis ${index + 1}:`, {
+                id: thesis.id,
+                title: thesis.title,
+                requestDueDate: thesis.requestDueDate,
+                thesisDueDate: thesis.thesisDueDate,
+                approved: thesis.approved,
+                submitted: thesis.submitted,
+                student: thesis.student?.username || 'Not assigned',
+            });
+        });
+
+        res.status(200).json(theses);
     } catch (error) {
         console.error('Failed to fetch theses:', error);
         res.status(500).json({ message: 'Failed to fetch theses' });
     }
 });
+
 
 // Route for students to fetch unassigned thesis titles
 router.get('/thesis/unassigned', authenticate, authorizeStudent, async (req, res) => {
@@ -306,26 +335,30 @@ router.post('/thesis/approve', authenticate, authorizeTeacher, async (req, res) 
         res.status(500).json({ message: 'Failed to approve thesis' });
     }
 });
-// Update thesis due date by ID
-router.put('/thesis/:thesisId/due-date', authenticate, authorizeTeacher, async (req, res) => {
+// Update request due date and thesis due date by ID
+router.put('/thesis/:thesisId/due-dates', authenticate, authorizeTeacher, async (req, res) => {
     const { thesisId } = req.params;
-    const { date } = req.body;
+    const { requestDueDate, thesisDueDate } = req.body;
 
-    if (!date) {
-        return res.status(400).json({ message: 'Due date is required' });
+    if (!requestDueDate || !thesisDueDate) {
+        return res.status(400).json({ message: 'Both request due date and thesis due date are required' });
     }
 
     try {
         const updatedThesis = await prisma.thesis.update({
             where: { id: parseInt(thesisId) },
-            data: { date },
+            data: {
+                requestDueDate,
+                thesisDueDate,
+            },
         });
-        console.log('Thesis due date updated successfully:', thesisId);
-        res.status(200).json({ message: 'Due date updated successfully', updatedThesis });
+        console.log('Thesis due dates updated successfully:', thesisId);
+        res.status(200).json({ message: 'Due dates updated successfully', updatedThesis });
     } catch (error) {
-        console.error('Failed to update due date:', error);
-        res.status(500).json({ message: 'Failed to update due date' });
+        console.error('Failed to update due dates:', error);
+        res.status(500).json({ message: 'Failed to update due dates' });
     }
 });
+
 
 module.exports = router;

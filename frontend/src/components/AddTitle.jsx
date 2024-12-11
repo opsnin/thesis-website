@@ -7,7 +7,8 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5174';
 
 const AddTitle = () => {
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState(null);
+  const [requestDueDate, setRequestDueDate] = useState(null);
+  const [thesisDueDate, setThesisDueDate] = useState(null);
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -25,7 +26,7 @@ const AddTitle = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({ title, date, description }),
+        body: JSON.stringify({ title, requestDueDate, thesisDueDate, description }),
       });
 
       if (!response.ok) {
@@ -60,18 +61,35 @@ const AddTitle = () => {
             required
             className="w-full p-3 rounded-md border focus:outline-none focus:ring focus:ring-blue-500"
           />
+
           <div className="relative">
+            <label className="block mb-2 text-gray-700 font-semibold">Due Date to Request for Title</label>
             <DatePicker
-              selected={date}
-              onChange={(date) => setDate(date)}
+              selected={requestDueDate}
+              onChange={(date) => setRequestDueDate(date)}
               dateFormat="MM/dd/yyyy"
-              placeholderText="Due date"
+              placeholderText="Select request due date"
               className="w-full p-3 rounded-md border focus:outline-none focus:ring focus:ring-blue-500"
             />
             <span className="absolute inset-y-0 right-4 flex items-center text-gray-500">
               📅
             </span>
           </div>
+
+          <div className="relative">
+            <label className="block mb-2 text-gray-700 font-semibold">Due Date for This Thesis</label>
+            <DatePicker
+              selected={thesisDueDate}
+              onChange={(date) => setThesisDueDate(date)}
+              dateFormat="MM/dd/yyyy"
+              placeholderText="Select thesis due date"
+              className="w-full p-3 rounded-md border focus:outline-none focus:ring focus:ring-blue-500"
+            />
+            <span className="absolute inset-y-0 right-4 flex items-center text-gray-500">
+              📅
+            </span>
+          </div>
+
           <textarea
             placeholder="Thesis Description"
             value={description}
@@ -79,8 +97,10 @@ const AddTitle = () => {
             required
             className="w-full p-3 rounded-md border focus:outline-none focus:ring focus:ring-blue-500"
           ></textarea>
+          
           {error && <p className="text-red-500">{error}</p>}
           {success && <p className="text-green-500">{success}</p>}
+          
           <button type="submit" className="w-full p-3 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition-colors">
             Add Title
           </button>
