@@ -119,6 +119,15 @@ router.get('/thesis/student', authenticate, async (req, res) => {
                 feedbacks: {
                     include: { author: { select: { username: true } } },
                 },
+                subtasks: { // Include subtasks in the response
+                    select: {
+                        id: true,
+                        week: true,
+                        description: true,
+                        submitted: true, // Add submission status if applicable
+                        fileName: true, // Include file name for submitted files
+                    },
+                },
             },
         });
         console.log('Fetched theses for student:', theses.length);
@@ -129,6 +138,7 @@ router.get('/thesis/student', authenticate, async (req, res) => {
     }
 });
 
+
 // Fetch thesis details with assignment information
 router.get('/thesis/:thesisId/details', authenticate, async (req, res) => {
     const { thesisId } = req.params;
@@ -138,6 +148,7 @@ router.get('/thesis/:thesisId/details', authenticate, async (req, res) => {
         const thesis = await prisma.thesis.findUnique({
             where: { id: parseInt(thesisId) },
             include: {
+                subtasks: true,
                 student: { select: { username: true, id: true } },
             },
         });
@@ -153,6 +164,7 @@ router.get('/thesis/:thesisId/details', authenticate, async (req, res) => {
             lastUpdate: thesis.lastUpdate ? thesis.lastUpdate.toISOString() : null,
             submitted: thesis.submitted,
             fileName: thesis.fileName,
+            subtasks: thesis.subtasks,
         });
     } catch (error) {
         console.error('Error fetching thesis details:', error);
@@ -182,20 +194,29 @@ router.get('/thesis/:thesisId/feedbacks', authenticate, async (req, res) => {
 
 // Route for teachers to create a thesis title
 router.post('/thesis/add', authenticate, authorizeTeacher, async (req, res) => {
-    const { title, requestDueDate, thesisDueDate, description } = req.body;
-    console.log('Adding thesis title:', { title, requestDueDate, thesisDueDate, description });
+    const { title, requestDueDate, thesisDueDate, description, subtasks } = req.body;
+    console.log('Adding thesis title:', { title, requestDueDate, thesisDueDate, description, subtasks });
 
     try {
         const thesis = await prisma.thesis.create({
             data: {
                 title,
-                requestDueDate,
-                thesisDueDate,
+                requestDueDate: new Date(requestDueDate).toISOString(), // Convert to ISO string
+                thesisDueDate: new Date(thesisDueDate).toISOString(),   // Convert to ISO string
                 description,
                 addedBy: req.userId,
+                subtasks: {
+                    create: subtasks.map((subtask) => ({
+                        week: subtask.week,
+                        description: subtask.description,
+                    })),
+                },
+            },
+            include: {
+                subtasks: true,
             },
         });
-        console.log('Thesis title added successfully:', title);
+        console.log('Thesis title added successfully:', thesis.title);
         res.status(201).json({ message: 'Thesis title added successfully', thesis });
     } catch (error) {
         console.error('Failed to add thesis title:', error);
@@ -223,12 +244,19 @@ router.get('/thesis/view', authenticate, authorizeTeacher, async (req, res) => {
                 student: {
                     select: { username: true },
                 },
+                subtasks: { // Include subtasks in the response
+                    select: {
+                        id: true,
+                        week: true,
+                        description: true,
+                    },
+                },
             },
         });
 
         console.log('Fetched theses count:', theses.length);
 
-        // Debugging individual thesis details (optional)
+        // Debugging individual thesis details with subtasks
         theses.forEach((thesis, index) => {
             console.log(`Thesis ${index + 1}:`, {
                 id: thesis.id,
@@ -238,6 +266,7 @@ router.get('/thesis/view', authenticate, authorizeTeacher, async (req, res) => {
                 approved: thesis.approved,
                 submitted: thesis.submitted,
                 student: thesis.student?.username || 'Not assigned',
+                subtasks: thesis.subtasks,
             });
         });
 
@@ -247,6 +276,7 @@ router.get('/thesis/view', authenticate, authorizeTeacher, async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch theses' });
     }
 });
+
 
 
 // Route for students to fetch unassigned thesis titles
@@ -360,5 +390,40 @@ router.put('/thesis/:thesisId/due-dates', authenticate, authorizeTeacher, async 
     }
 });
 
-
+router.get('/:thesisId/subtasks', authenticate, async (req, res) => {
+    const { thesisId } = req.params;
+  
+    try {
+      const subtasks = await prisma.subtask.findMany({
+        where: { thesisId: parseInt(thesisId) },
+        select: {
+          id: true,
+          week: true,
+          description: true,
+          fileName: true,
+        },
+      });
+  
+      res.status(200).json(subtasks);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch subtasks' });
+    }
+  });
+  
+  router.post('/subtask/:subtaskId/upload', authenticate, authorizeStudent, upload.single('file'), async (req, res) => {
+    const { subtaskId } = req.params;
+  
+    try {
+      const subtask = await prisma.subtask.update({
+        where: { id: parseInt(subtaskId) },
+        data: { fileName: req.file.filename },
+      });
+  
+      res.status(200).json({ message: 'File uploaded successfully', subtask });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to upload file' });
+    }
+  });
+  
+  
 module.exports = router;

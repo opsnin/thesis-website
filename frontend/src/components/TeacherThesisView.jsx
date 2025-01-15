@@ -16,6 +16,32 @@ const Header = ({ onBack, title }) => (
   </header>
 );
 
+// SubtaskTree Component
+const SubtaskTree = ({ subtasks }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div>
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="text-blue-500 underline hover:text-blue-700 mt-2"
+      >
+        {isExpanded ? 'Hide Subtasks' : 'View Subtasks'}
+      </button>
+      {isExpanded && (
+        <ul className="ml-6 mt-4 list-disc">
+          {subtasks.map((subtask, index) => (
+            <li key={index} className="mb-2 bg-gray-50 p-3 rounded shadow">
+              <p className="font-semibold">Week: {subtask.week}</p>
+              <p>Description: {subtask.description}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
 // ThesisCard Component
 const ThesisCard = ({ thesis, onClick, onDelete, onDueDateUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -37,7 +63,7 @@ const ThesisCard = ({ thesis, onClick, onDelete, onDueDateUpdate }) => {
   return (
     <div className="bg-gray-100 p-6 rounded-lg mb-6 shadow-lg hover:shadow-xl transition-shadow">
       <div className="flex justify-between items-start">
-        <div className="cursor-pointer flex-1" onClick={!isEditing ? () => onClick(thesis.id) : undefined}>
+        <div className="flex-1" onClick={!isEditing ? () => onClick(thesis.id) : undefined}>
           <h2 className="text-xl font-bold text-blue-700 mb-2">{thesis.title}</h2>
           <p className="text-gray-600 mb-2">{thesis.description}</p>
 
@@ -89,6 +115,21 @@ const ThesisCard = ({ thesis, onClick, onDelete, onDueDateUpdate }) => {
                 Download
               </a>
             </p>
+          )}
+
+          {/* Display Subtasks Directly */}
+          {thesis.subtasks && thesis.subtasks.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold">Subtasks</h3>
+              <ul className="ml-6 mt-2 list-disc">
+                {thesis.subtasks.map((subtask, index) => (
+                  <li key={index} className="mb-2 bg-gray-50 p-3 rounded shadow">
+                    <p className="font-semibold">Week: {subtask.week}</p>
+                    <p>Description: {subtask.description}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
 
@@ -204,11 +245,11 @@ const TeacherThesisView = () => {
         },
         body: JSON.stringify(dates),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to update due dates');
       }
-  
+
       setTheses((prevTheses) =>
         prevTheses.map((thesis) =>
           thesis.id === thesisId
@@ -220,8 +261,7 @@ const TeacherThesisView = () => {
     } catch (err) {
       setError('Failed to update due dates');
     }
-  };  
-
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-50 to-gray-100 p-8">

@@ -21,8 +21,8 @@ model User {
 model Thesis {
   id             Int       @id @default(autoincrement())
   title          String
-  requestDueDate String     // New field for the due date to request the title
-  thesisDueDate  String     // New field for the due date for the thesis
+  requestDueDate String     // Due date to request the title
+  thesisDueDate  String     // Due date for the thesis
   description    String
   addedBy        Int?
   requestedBy    Int?
@@ -34,8 +34,18 @@ model Thesis {
   teacher   User?      @relation("AddedBy", fields: [addedBy], references: [id], onDelete: Cascade)
   student   User?      @relation("RequestedBy", fields: [requestedBy], references: [id], onDelete: Cascade)
   feedbacks Feedback[] @relation("ThesisFeedback")
+  subtasks  Subtask[]  @relation("ThesisSubtasks") // Relation to Subtasks
 }
 
+model Subtask {
+  id          Int      @id @default(autoincrement())
+  week        String
+  description String
+  submitted   Boolean  @default(false) // Add this field
+  fileName    String?  // Optional field for uploaded file names
+  thesisId    Int
+  thesis      Thesis   @relation("ThesisSubtasks", fields: [thesisId], references: [id]) // Define the opposite relation here
+}
 
 model Feedback {
   id        Int      @id @default(autoincrement())

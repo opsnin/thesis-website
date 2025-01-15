@@ -78,20 +78,8 @@ const FeedbackView = () => {
     }
   };
 
-  // Function to generate bright colors based on the user ID or username
   const getColorForUser = (userId) => {
-    const colors = [
-      '#FFB6C1', // Light Pink
-      '#FFA07A', // Light Salmon
-      '#FFD700', // Gold
-      '#98FB98', // Pale Green
-      '#87CEFA', // Light Sky Blue
-      '#FF69B4', // Hot Pink
-      '#FF6347', // Tomato
-      '#40E0D0', // Turquoise
-      '#FFDAB9', // Peach Puff
-      '#AFEEEE', // Pale Turquoise
-    ];
+    const colors = ['#FFB6C1', '#FFA07A', '#FFD700', '#98FB98', '#87CEFA', '#FF69B4', '#FF6347', '#40E0D0', '#FFDAB9', '#AFEEEE'];
     return colors[userId % colors.length];
   };
 
@@ -116,10 +104,30 @@ const FeedbackView = () => {
           </p>
           {assignmentDetails.fileName && (
             <p className="text-gray-700">
-              File: <a href={`${backendUrl}/thesis/thesis/files/${assignmentDetails.fileName}`} download className="text-blue-500 underline">
+              File: <a href={`${backendUrl}/thesis/${assignmentDetails.fileName}`} download className="text-blue-500 underline">
                 {assignmentDetails.fileName}
               </a>
             </p>
+          )}
+          {assignmentDetails.subtasks && assignmentDetails.subtasks.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold">Subtasks</h3>
+              <ul className="ml-6 list-disc">
+                {assignmentDetails.subtasks.map((subtask) => (
+                  <li key={subtask.id} className="mb-4 bg-gray-50 p-4 rounded shadow">
+                    <p><strong>Week:</strong> {subtask.week}</p>
+                    <p><strong>Description:</strong> {subtask.description}</p>
+                    {subtask.fileName && (
+                      <p>
+                        File: <a href={`${backendUrl}/thesis/subtask/${subtask.fileName}`} download className="text-blue-500 underline">
+                          {subtask.fileName}
+                        </a>
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       )}

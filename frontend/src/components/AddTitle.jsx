@@ -10,9 +10,25 @@ const AddTitle = () => {
   const [requestDueDate, setRequestDueDate] = useState(null);
   const [thesisDueDate, setThesisDueDate] = useState(null);
   const [description, setDescription] = useState('');
+  const [subtasks, setSubtasks] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+
+  const handleAddSubtask = () => {
+    setSubtasks([...subtasks, { week: '', description: '' }]);
+  };
+
+  const handleSubtaskChange = (index, field, value) => {
+    const updatedSubtasks = [...subtasks];
+    updatedSubtasks[index][field] = value;
+    setSubtasks(updatedSubtasks);
+  };
+
+  const handleRemoveSubtask = (index) => {
+    const updatedSubtasks = subtasks.filter((_, i) => i !== index);
+    setSubtasks(updatedSubtasks);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +42,13 @@ const AddTitle = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({ title, requestDueDate, thesisDueDate, description }),
+        body: JSON.stringify({
+          title,
+          requestDueDate,
+          thesisDueDate,
+          description,
+          subtasks,
+        }),
       });
 
       if (!response.ok) {
@@ -71,9 +93,6 @@ const AddTitle = () => {
               placeholderText="Select request due date"
               className="w-full p-3 rounded-md border focus:outline-none focus:ring focus:ring-blue-500"
             />
-            <span className="absolute inset-y-0 right-4 flex items-center text-gray-500">
-              📅
-            </span>
           </div>
 
           <div className="relative">
@@ -85,9 +104,6 @@ const AddTitle = () => {
               placeholderText="Select thesis due date"
               className="w-full p-3 rounded-md border focus:outline-none focus:ring focus:ring-blue-500"
             />
-            <span className="absolute inset-y-0 right-4 flex items-center text-gray-500">
-              📅
-            </span>
           </div>
 
           <textarea
@@ -97,7 +113,44 @@ const AddTitle = () => {
             required
             className="w-full p-3 rounded-md border focus:outline-none focus:ring focus:ring-blue-500"
           ></textarea>
-          
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Subtasks</h3>
+            {subtasks.map((subtask, index) => (
+              <div key={index} className="space-y-2 border p-4 rounded-md bg-white">
+                <input
+                  type="text"
+                  placeholder="Week"
+                  value={subtask.week}
+                  onChange={(e) => handleSubtaskChange(index, 'week', e.target.value)}
+                  required
+                  className="w-full p-2 border rounded-md"
+                />
+                <textarea
+                  placeholder="Subtask Description"
+                  value={subtask.description}
+                  onChange={(e) => handleSubtaskChange(index, 'description', e.target.value)}
+                  required
+                  className="w-full p-2 border rounded-md"
+                ></textarea>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveSubtask(index)}
+                  className="text-red-500 hover:underline"
+                >
+                  Remove Subtask
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={handleAddSubtask}
+              className="p-2 bg-green-600 text-white rounded-md hover:bg-green-500"
+            >
+              Add Subtask
+            </button>
+          </div>
+
           {error && <p className="text-red-500">{error}</p>}
           {success && <p className="text-green-500">{success}</p>}
           

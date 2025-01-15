@@ -18,7 +18,8 @@ app.use(cors({
 }));
 
 // Serve static files for theses
-app.use('/thesis/thesis/files', express.static(path.join(__dirname, 'student-thesis')));
+app.use('/thesis/', express.static(path.join(__dirname, 'student-thesis')));
+app.use('/thesis/subtask/', express.static(path.join(__dirname, 'student-thesis')));
 
 // Parse JSON body
 app.use(bodyParser.json());
